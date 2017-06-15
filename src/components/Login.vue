@@ -13,7 +13,9 @@
 
 <script>
 import Header from './Header';
-import { mapActions } from "vuex";
+import { mapState } from "vuex";
+import axios from 'axios';
+import { setStore } from '../units/localStorage.js';
 export default {
   data() {
     return {
@@ -23,13 +25,23 @@ export default {
   created() {
 
   },
+
   methods: {
-    ...mapActions(['singin']),
+    computed: {
+      ...mapState([
+        'loginInfo'
+      ])
+    },
     back() {
       this.$router.back(-1)
     },
     login() {
-      this.$store.dispatch('singin',this.accessToken);
+      axios.post(`https://cnodejs.org/api/v1/accesstoken?accesstoken=${this.accessToken}`).then(res => {
+        this.$store.dispatch('loginInfo', res.data);
+        setStore('loginInfo',res.data);
+        this.$store.dispatch('loginStatus', true)
+        this.$router.back(-1);
+      })
     }
   }
 }

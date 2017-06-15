@@ -9,13 +9,28 @@
 </template>
 
 <script>
-import Slider from './Silder';
+import Slider from './Silder'
+import { mapState } from 'vuex'
+import { getStore } from '../units/localStorage.js'
 export default {
   name: 'head',
   data() {
     return {
       msg: 'Welcome to Your Vue.js App'
     }
+  },
+  computed: {
+    ...mapState([
+      'loginStatus', 'loginTip'
+    ])
+  },
+  mounted() {
+    this.$nextTick(() => {
+      if (getStore('loginInfo') != null) {
+        this.$store.dispatch('loginInfo', getStore('loginInfo'));
+        this.$store.dispatch('loginStatus', true)
+      }
+    })
   },
   methods: {
     sliderLeft() {
