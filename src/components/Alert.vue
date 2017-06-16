@@ -1,15 +1,28 @@
 <template>
-    <div class="alert">
-        <section>
-            <p>{{alertText}}</p>   
-        </section>
-    </div>
+    <transition name='fade'>
+        <div class="alert" v-if='show'>
+            <p>{{alertText}}</p>
+        </div>
+    </transition>
 </template>
 
 <script>
 
-export default{
-    props:['alertText']
+export default {
+    data() {
+        return { show: true }
+    },
+    props: {
+        alertText: {//默认信息
+            type: String,
+            default: '我是弹出框！'
+        }
+    },
+    created() {
+        setTimeout(() => {
+            this.show = false
+        }, 1000)
+    }
 }
 
 </script>
@@ -17,26 +30,27 @@ export default{
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang='less'>
 @import '../assets/css/conment.less';
+.fade-enter-active,
+.fade-leave-active {
+    transition: all .3s ease;
+}
+.fade-enter,
+.fade-leave-active {
+    opacity: 0
+}
+
 .alert {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, .2);
     position: fixed;
-    top:0;
-    left: 0;
+    top: 20px;
+    left: 50%;
     z-index: 9999999999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    section{
-        width: 600rem/75;
-        height: 200rem/75;
-        background-color: #fff;
-        border-radius: 2px;
-        p{
-            padding: 30rem/75 0 0 30rem/75;
-            font-size: 18px;
-        }
-    }
+    padding: 8px 16px;
+    border-radius: 4px;
+    border-radius: 4px;
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 14px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transform: translate(-50%, 0);
 }
 </style>

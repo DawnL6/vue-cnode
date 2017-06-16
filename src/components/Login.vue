@@ -8,6 +8,7 @@
       <input v-model="accessToken" />
       <button @click='login'>登陆</button>
     </div>
+    <Alert alertText='test' v-if='showMessage'></Alert>
   </div>
 </template>
 
@@ -15,17 +16,21 @@
 import Header from './Header';
 import { mapState } from "vuex";
 import axios from 'axios';
+import Alert from './Alert'
 import { setStore } from '../units/localStorage.js';
 export default {
   data() {
     return {
-      accessToken: ''
+      accessToken: '',
+      showMessage:false
     }
   },
   created() {
 
   },
-
+  components: {
+    Alert
+  },
   methods: {
     computed: {
       ...mapState([
@@ -38,9 +43,12 @@ export default {
     login() {
       axios.post(`https://cnodejs.org/api/v1/accesstoken?accesstoken=${this.accessToken}`).then(res => {
         this.$store.dispatch('loginInfo', res.data);
-        setStore('loginInfo',res.data);
+        setStore('loginInfo', res.data);
         this.$store.dispatch('loginStatus', true)
         this.$router.back(-1);
+        this.showMessage = true;
+      }).catch(()=>{
+         this.showMessage = true;
       })
     }
   }

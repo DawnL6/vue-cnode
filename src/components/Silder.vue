@@ -8,7 +8,7 @@
                         <img :src="loginInfo.avatar_url" alt="Avatar">
                     </router-link>
                     <p>{{loginInfo.loginname}}</p>
-                    <span @clcik='longot'>登出</span>
+                    <span @click='longout'>登出</span>
                 </div>
                 <div class="img" v-else>
                     <router-link to='login'>
@@ -17,22 +17,29 @@
                     <p>点击头像登陆</p>
                 </div>
             </div>
-            <Alert alertText='你确定注销吗？'></Alert>
+            <div class="logout" v-if='show'>
+                <section>
+                    <span class="iconfontyyy">&#xe65a;</span>
+                    <p>确定要退出吗</p>
+                    <div class="but">
+                        <button @click='cancel'>在等等</button>
+                        <button class="quit" @click='ok'>退出登陆</button>
+                    </div>
+                </section>
+            </div>
         </div>
     </transition>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import Alert from './Alert';
+import {removeStore} from '../units/localStorage.js';
 export default {
     data() {
         return {
-            silderClass: false
+            silderClass: false,
+            show: false
         }
-    },
-    components: {
-        Alert
     },
     computed: {
         ...mapState([
@@ -43,8 +50,17 @@ export default {
         toggle() {
             this.silderClass = !this.silderClass
         },
-        longot() {
-
+        longout() {
+            this.show = true;
+        },
+        cancel() {
+            this.show = false;
+        },
+        ok() {
+            removeStore('loginInfo');
+            this.$store.dispatch('loginInfo', {});
+            this.$store.dispatch('loginStatus', false);
+            this.show = false;
         }
     }
 }
@@ -127,6 +143,52 @@ export default {
         background-color: rgba(0, 0, 0, 0);
         transition: all .3s;
         z-index: 2;
+    }
+    .logout {
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, .2);
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        section {
+            width: 600rem/75;
+            background-color: #fff;
+            border-radius: 2px;
+            margin-top: -0.8rem;
+            span {
+                display: block;
+                font-size: 100px;
+                text-align: center;
+                color: #f8bb86;
+            }
+            p {
+                text-align: center;
+                font-size: 18px;
+                margin: 0.1333rem 0;
+            }
+            .but {
+                width: 100%;
+                text-align: center;
+                button {
+                    outline: none;
+                    border: none;
+                    display: inline-block;
+                    padding: .2rem .8rem;
+                    border-radius: 0.0667rem;
+                    font-size: 18px;
+                    color: #fff;
+                    margin: 0.2667rem 0.0667rem;
+                }
+                .quit {
+                    background: #dd6b55;
+                }
+            }
+        }
     }
 }
 </style>
