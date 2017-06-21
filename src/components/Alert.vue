@@ -2,29 +2,29 @@
     <transition name='fade'>
         <div class="alert" v-if='show'>
             <p>{{alertText}}</p>
+            <button @click='close'>关闭</button>
         </div>
     </transition>
 </template>
 
 <script>
-
 export default {
-    data() {
-        return { show: true }
-    },
     props: {
         alertText: {//默认信息
             type: String,
             default: '我是弹出框！'
+        },
+        show: {//默认信息
+            type: Boolean,
+            default: false
         }
     },
-    created() {
-        setTimeout(() => {
-            this.show = false
-        }, 1000)
+    methods: {
+        close() {
+            this.$emit('close', this.show)
+        }
     }
 }
-
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -34,6 +34,7 @@ export default {
 .fade-leave-active {
     transition: all .3s ease;
 }
+
 .fade-enter,
 .fade-leave-active {
     opacity: 0

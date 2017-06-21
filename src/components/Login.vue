@@ -8,7 +8,7 @@
       <input v-model="accessToken" />
       <button @click='login'>登陆</button>
     </div>
-    <Alert alertText='test' v-if='showMessage'></Alert>
+    <Alert alertText='test' :show="show" @close='test'></Alert>
   </div>
 </template>
 
@@ -22,11 +22,10 @@ export default {
   data() {
     return {
       accessToken: '',
-      showMessage:false
+      show: false
     }
   },
   created() {
-
   },
   components: {
     Alert
@@ -46,10 +45,12 @@ export default {
         setStore('loginInfo', res.data);
         this.$store.dispatch('loginStatus', true)
         this.$router.back(-1);
-        this.showMessage = true;
-      }).catch(()=>{
-         this.showMessage = true;
+      }).catch(() => {
+        this.show = true
       })
+    },
+    test(data) {
+      this.show = false;
     }
   }
 }
