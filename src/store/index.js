@@ -8,8 +8,11 @@ import mutations from './mutations'
 Vue.use(Vuex);
 
 const state = {
-    loginStatus:false,//登陆状态
-    loginInfo:{}//登陆用户信息
+    tab: 'all',
+    page: 1,
+    loginStatus: false,//登陆状态
+    loginInfo: {},//登陆用户信息
+    topicList: []
 }
 export default new Vuex.Store({
     state,

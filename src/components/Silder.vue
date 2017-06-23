@@ -16,6 +16,9 @@
                     </router-link>
                     <p>点击头像登陆</p>
                 </div>
+                <ul>
+                    <li>全部</li>
+                </ul>
             </div>
             <div class="logout" v-if='show'>
                 <section>

@@ -5,10 +5,10 @@
       <h2>登陆</h2>
     </div>
     <div class="content">
-      <input v-model="accessToken" />
+      <input v-model="accessToken" type="text" />
       <button @click='login'>登陆</button>
     </div>
-    <Alert alertText='test' :show="show" @close='test'></Alert>
+    <Alert :alertText='alertText' :show="show" @close='dandleShow'></Alert>
   </div>
 </template>
 
@@ -22,7 +22,8 @@ export default {
   data() {
     return {
       accessToken: '',
-      show: false
+      show: false,
+      alertText: ''
     }
   },
   created() {
@@ -46,10 +47,11 @@ export default {
         this.$store.dispatch('loginStatus', true)
         this.$router.back(-1);
       }).catch(() => {
+        this.alertText = '您输入的Access Token不正确！'
         this.show = true
       })
     },
-    test(data) {
+    dandleShow() {
       this.show = false;
     }
   }
