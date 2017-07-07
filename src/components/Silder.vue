@@ -16,8 +16,31 @@
                     </router-link>
                     <p>点击头像登陆</p>
                 </div>
-                <ul>
-                    <li>全部</li>
+                <ul class="menu">
+                    <li :class="{ active: this.tab=='all' }" @click="switchTab('all')">
+                        <i class="iconfontyyy">&#xe606;</i>
+                        <span>全部</span>
+                    </li>
+                    <li :class="{ active: this.tab=='good' }" @click="switchTab('good')">
+                        <i class="iconfontyyy">&#xe66b;</i>
+                        <span>精华</span>
+                    </li>
+                    <li :class="{ active: this.tab=='share' }" @click="switchTab('share')">
+                        <i class="iconfontyyy">&#xe601;</i>
+                        <span>分享</span>
+                    </li>
+                    <li :class="{ active: this.tab=='ask' }" @click="switchTab('ask')">
+                        <i class="iconfontyyy">&#xe729;</i>
+                        <span>问答</span>
+                    </li>
+                    <li :class="{ active: this.tab=='job' }" @click="switchTab('job')">
+                        <i class="iconfontyyy">&#xe645;</i>
+                        <span>招聘</span>
+                    </li>
+                    <li :class="{ active: this.tab=='dev' }" @click="switchTab('dev')">
+                        <i class="iconfontyyy">&#xe60d;</i>
+                        <span>客户端测试</span>
+                    </li>
                 </ul>
             </div>
             <div class="logout" v-if='show'>
@@ -36,7 +59,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import {removeStore} from '../units/localStorage.js';
+import { removeStore } from '../units/localStorage.js';
 export default {
     data() {
         return {
@@ -44,9 +67,12 @@ export default {
             show: false
         }
     },
+    created() {
+        //console.log(this.tab)
+    },
     computed: {
         ...mapState([
-            'loginInfo', 'loginStatus'
+            'loginInfo', 'loginStatus', 'tab', 'changeTab'
         ])
     },
     methods: {
@@ -64,6 +90,15 @@ export default {
             this.$store.dispatch('loginInfo', {});
             this.$store.dispatch('loginStatus', false);
             this.show = false;
+        },
+        switchTab(tab) {
+            if (this.tab === tab) return;
+            this.$store.dispatch('changeTab', tab);
+            this.$router.push({ path: 'topic', query: { tab: tab } })
+            this.$store.dispatch('loadPage', 1);
+            document.body.scrollTop = 0;
+            this.$store.dispatch('showTop', true);
+            this.toggle();
         }
     }
 }
@@ -134,6 +169,44 @@ export default {
                 text-align: center;
                 line-height: 45rem/75;
                 color: #fff;
+            }
+        }
+        .menu {
+            margin-top: 10rem/75;
+            li {
+                font-size: 18px;
+                height: 46px;
+                line-height: 46px;
+                display: flex;
+                align-items: center;
+                i {
+                    margin: 0 10px;
+                    font-size: 24px;
+                }
+                span {
+                    margin-left: 15px;
+                }
+            }
+            .active {
+                background: #f0f0f0;
+            }
+            li:first-child i {
+                color: #388e3c;
+            }
+            li:nth-child(2) i {
+                color: #d32f2f;
+            }
+            li:nth-child(3) i {
+                color: #1976d2;
+            }
+            li:nth-child(4) i {
+                color: #f57c00;
+            }
+            li:nth-child(5) i {
+                color: #388e3c;
+            }
+            li:nth-child(6) i {
+                color: #1976d2;
             }
         }
     }

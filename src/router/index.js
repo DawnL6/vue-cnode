@@ -13,6 +13,11 @@ export default new Router({
       component: Header
     },
     {
+      path: '/topic',
+      name: 'Topic',
+      component: Header
+    },
+    {
       path: '/login',
       name: 'Login',
       component: Login

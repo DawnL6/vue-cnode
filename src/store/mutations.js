@@ -7,7 +7,17 @@ export default {
     [types.LOGIN_STATUS](state, loginStatus) {
         state.loginStatus = loginStatus;
     },
-    [types.TOPIC_LIST](state, topicList) {
-        state.topicList = topicList;
-    }
+    [types.LOAD_PAGE](state, num) {
+        if (num) {
+            state.page = num;
+        } else {
+            state.page++
+        }
+    },
+    [types.CHANGE_TAB](state, tab) {
+        state.tab = tab;
+    },
+    [types.SHOW_TOP](state, bool) {
+        state.showTop = bool;
+    },
 }

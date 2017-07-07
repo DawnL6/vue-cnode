@@ -12,7 +12,7 @@ const state = {
     page: 1,
     loginStatus: false,//登陆状态
     loginInfo: {},//登陆用户信息
-    topicList: []
+    showTop:true,
 }
 export default new Vuex.Store({
     state,

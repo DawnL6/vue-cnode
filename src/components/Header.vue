@@ -2,14 +2,16 @@
   <div>
     <div class="head">
       <span class="iconfontyyy" @click='sliderLeft'>&#xe606;</span>
-      <h2>Cnode 社区</h2>
+      <h2>{{tab | formatTitle}}</h2>
     </div>
-    <div v-if="loading" class="loading">
-      <img src="../assets/images/loading.svg" alt="">
-      <p>加载中......</p>
+    <div v-if="showTop" class="loading">
+      <div>
+        <img src="../assets/images/loading.svg" alt="" width="40">
+        <p>加载中......</p>
+      </div>
     </div>
     <ul class="lists">
-      <li v-for="item in this.topicList" :key='item.id'>
+      <li v-for="item in list" :key='item.id'>
         <div>
           <span class="type-top" v-if="item.top">置顶</span>
           <span class="type-top" v-else-if="item.good">精华</span>
@@ -33,39 +35,48 @@
         </div>
       </li>
     </ul>
+    <div class="load" v-show="loadMore">
+      <img src="../assets/images/spinning-circles.svg" alt="" width="30">
+    </div>
     <Slider></Slider>
+    <ToTop v-if='top'></ToTop>
   </div>
 </template>
 
 <script>
 import Slider from './Silder'
+import ToTop from './ToTop'
 import { mapState } from 'vuex'
 import { getStore } from '../units/localStorage.js'
-import axios from 'axios';
-//import lo from '../assets/images/loading.svg'
+import axios from 'axios'
 export default {
   name: 'head',
   data() {
     return {
       url: 'https://cnodejs.org/api/v1/topics',
-      loading: true
+      list: [],
+      loadMore: false,//加载更多动画
+      top: false,//返回顶部
     }
   },
   computed: {
     ...mapState([
-      'loginStatus', 'loginInfo', 'tab', 'page', 'topicList'
+      'loginStatus', 'loginInfo', 'tab', 'page', 'loadPage', 'showTop'
     ])
   },
   created() {
-    console.log(this.$route.query)
-    this.getData(this.tab)
+
   },
   mounted() {
     this.$nextTick(() => {
+      this.getData(this.tab);
+      document.body.scrollTop = 0;
+      this.$store.dispatch('loadPage', 1);
       if (getStore('loginInfo') != null) {
         this.$store.dispatch('loginInfo', getStore('loginInfo'));
-        this.$store.dispatch('loginStatus', true)
+        this.$store.dispatch('loginStatus', true);
       }
+      window.addEventListener('scroll', this.more);
     })
   },
   methods: {
@@ -74,15 +85,42 @@ export default {
     },
     getData(tab) {
       axios.get(`${this.url}?limit=20&tab=${tab}`).then(res => {
-        this.$store.dispatch('topicList', res.data.data);
-        this.loading = false;
+        this.list = res.data.data;
+        this.$store.dispatch('showTop', false);
       }).catch(() => {
 
       })
+    },
+    more() {
+      let scrolled = document.body.scrollTop;
+      if (scrolled + window.screen.height == (document.body.scrollHeight)) {
+        this.loadMore = true;
+        this.$store.dispatch('loadPage');
+      }
+      if (scrolled > 1500) {
+        this.top = true;
+      } else {
+        this.top = false;
+      }
+    }
+  },
+  watch: {
+    page(val) {
+      if (val == 1) return;
+      axios.get(`${this.url}?limit=20&tab=${this.tab}&page=${val}`).then(res => {
+        this.list = this.list.concat(res.data.data);
+        setTimeout(() => {
+          this.loadMore = false;
+        }, 100)
+      })
+    },
+    tab(nTab) {
+      this.getData(nTab);
     }
   },
   components: {
-    Slider
+    Slider,
+    ToTop
   },
   filters: {
     formatTime(str) {
@@ -103,8 +141,27 @@ export default {
       } else {
         return parseInt(time / 31536000000) + '年前';
       }
-    }
+    },
+    formatTitle(value) {
+      switch (value) {
+        case 'all':
+          return 'CNode社区'
+        case 'good':
+          return '精华'
+        case 'share':
+          return '分享'
+        case 'ask':
+          return '问答'
+        case 'job':
+          return '招聘'
+        case 'dev':
+          return '测试'
+        default:
+          return 'CNode社区'
+      }
+    },
   }
+
 }
 </script>
 
@@ -113,11 +170,19 @@ export default {
 @import '../assets/css/conment.less';
 .loading {
   position: fixed;
-  top: 10%;
+  display: flex;
+  top: 0;
   left: 0;
   z-index: 1231233232;
   width: 100%;
-  text-align: center;
+  height: 100%;
+  background-color: rgba(0, 0, 0, .4);
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  div {
+    margin-top: -50%;
+  }
 }
 
 .head {
@@ -187,6 +252,21 @@ export default {
         }
       }
     }
+  }
+}
+
+.load {
+  position: fixed;
+  height: 40px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, .1);
+  z-index: 10000;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+
+  img {
+    margin-top: 5px;
   }
 }
 </style>
