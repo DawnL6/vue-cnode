@@ -11,7 +11,7 @@
       </div>
     </div>
     <ul class="lists">
-      <li v-for="item in list" :key='item.id'>
+      <li v-for="item in list" :key='item.id' @click="detail(item.id)">
         <div>
           <span class="type-top" v-if="item.top">置顶</span>
           <span class="type-top" v-else-if="item.good">精华</span>
@@ -44,75 +44,84 @@
 </template>
 
 <script>
-import Slider from './Silder'
-import ToTop from './ToTop'
-import { mapState } from 'vuex'
-import { getStore } from '../units/localStorage.js'
-import axios from 'axios'
+import Slider from "./Silder";
+import ToTop from "./ToTop";
+import { mapState } from "vuex";
+import { getStore } from "../units/localStorage.js";
+import axios from "axios";
 export default {
-  name: 'head',
+  name: "head",
   data() {
     return {
-      url: 'https://cnodejs.org/api/v1/topics',
+      url: "https://cnodejs.org/api/v1/topics",
       list: [],
-      loadMore: false,//加载更多动画
-      top: false,//返回顶部
-    }
+      loadMore: false, //加载更多动画
+      top: false //返回顶部
+    };
   },
   computed: {
     ...mapState([
-      'loginStatus', 'loginInfo', 'tab', 'page', 'loadPage', 'showTop'
+      "loginStatus",
+      "loginInfo",
+      "tab",
+      "page",
+      "loadPage",
+      "showTop"
     ])
   },
-  created() {
-
-  },
+  created() {},
   mounted() {
     this.$nextTick(() => {
       this.getData(this.tab);
-      document.body.scrollTop = 0;
-      this.$store.dispatch('loadPage', 1);
-      if (getStore('loginInfo') != null) {
-        this.$store.dispatch('loginInfo', getStore('loginInfo'));
-        this.$store.dispatch('loginStatus', true);
+      //document.body.scrollTop = 0;
+      this.$store.dispatch("loadPage", 1);
+      if (getStore("loginInfo") != null) {
+        this.$store.dispatch("loginInfo", getStore("loginInfo"));
+        this.$store.dispatch("loginStatus", true);
       }
-      window.addEventListener('scroll', this.more);
-    })
+      window.addEventListener("scroll", this.more);
+    });
   },
   methods: {
     sliderLeft() {
       this.$children[0].toggle();
     },
     getData(tab) {
-      axios.get(`${this.url}?limit=20&tab=${tab}`).then(res => {
-        this.list = res.data.data;
-        this.$store.dispatch('showTop', false);
-      }).catch(() => {
-
-      })
+      axios
+        .get(`${this.url}?limit=20&tab=${tab}`)
+        .then(res => {
+          this.list = res.data.data;
+          this.$store.dispatch("showTop", false);
+        })
+        .catch(() => {});
     },
     more() {
       let scrolled = document.body.scrollTop;
-      if (scrolled + window.screen.height == (document.body.scrollHeight)) {
+      if (scrolled + window.screen.height == document.body.scrollHeight) {
         this.loadMore = true;
-        this.$store.dispatch('loadPage');
+        this.$store.dispatch("loadPage");
       }
       if (scrolled > 1500) {
         this.top = true;
       } else {
         this.top = false;
       }
+    },
+    detail(id) {
+      this.$router.push({ path: "/detail", query: { id: id } });
     }
   },
   watch: {
     page(val) {
       if (val == 1) return;
-      axios.get(`${this.url}?limit=20&tab=${this.tab}&page=${val}`).then(res => {
-        this.list = this.list.concat(res.data.data);
-        setTimeout(() => {
-          this.loadMore = false;
-        }, 100)
-      })
+      axios
+        .get(`${this.url}?limit=20&tab=${this.tab}&page=${val}`)
+        .then(res => {
+          this.list = this.list.concat(res.data.data);
+          setTimeout(() => {
+            this.loadMore = false;
+          }, 100);
+        });
     },
     tab(nTab) {
       this.getData(nTab);
@@ -127,47 +136,46 @@ export default {
       var date = new Date(str);
       var time = new Date().getTime() - date.getTime(); //现在的时间-传入的时间 = 相差的时间（单位 = 毫秒）
       if (time < 0) {
-        return '';
+        return "";
       } else if (time / 1000 < 60) {
-        return '刚刚';
-      } else if ((time / 60000) < 60) {
-        return parseInt((time / 60000)) + '分钟前';
-      } else if ((time / 3600000) < 24) {
-        return parseInt(time / 3600000) + '小时前';
-      } else if ((time / 86400000) < 31) {
-        return parseInt(time / 86400000) + '天前';
-      } else if ((time / 2592000000) < 12) {
-        return parseInt(time / 2592000000) + '月前';
+        return "刚刚";
+      } else if (time / 60000 < 60) {
+        return parseInt(time / 60000) + "分钟前";
+      } else if (time / 3600000 < 24) {
+        return parseInt(time / 3600000) + "小时前";
+      } else if (time / 86400000 < 31) {
+        return parseInt(time / 86400000) + "天前";
+      } else if (time / 2592000000 < 12) {
+        return parseInt(time / 2592000000) + "月前";
       } else {
-        return parseInt(time / 31536000000) + '年前';
+        return parseInt(time / 31536000000) + "年前";
       }
     },
     formatTitle(value) {
       switch (value) {
-        case 'all':
-          return 'CNode社区'
-        case 'good':
-          return '精华'
-        case 'share':
-          return '分享'
-        case 'ask':
-          return '问答'
-        case 'job':
-          return '招聘'
-        case 'dev':
-          return '测试'
+        case "all":
+          return "CNode社区";
+        case "good":
+          return "精华";
+        case "share":
+          return "分享";
+        case "ask":
+          return "问答";
+        case "job":
+          return "招聘";
+        case "dev":
+          return "测试";
         default:
-          return 'CNode社区'
+          return "CNode社区";
       }
-    },
+    }
   }
-
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang='less'>
-@import '../assets/css/conment.less';
+@import "../assets/css/conment.less";
 .loading {
   position: fixed;
   display: flex;
@@ -176,7 +184,7 @@ export default {
   z-index: 1231233232;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, .4);
+  background-color: rgba(0, 0, 0, 0.4);
   color: #fff;
   align-items: center;
   justify-content: center;
@@ -259,7 +267,7 @@ export default {
   position: fixed;
   height: 40px;
   width: 100%;
-  background-color: rgba(0, 0, 0, .1);
+  background-color: rgba(0, 0, 0, 0.1);
   z-index: 10000;
   bottom: 0;
   left: 0;
